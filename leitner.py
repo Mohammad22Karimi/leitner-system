@@ -22,6 +22,27 @@ def load_boxes():
     with open(DATA_FILE, "r") as file:
         return json.load(file)
 
+def save_boxes(boxes):
+    with open(DATA_FILE, "w") as file:
+        json.dump(boxes, file, indent=4)
+
+def add_word(boxes, word, meaning):
+    boxes["1"].append({"word": word, "meaning": meaning, "last_reiviewed": datetime.now().isoformat()})
+    print(f"Added '{word}' to box 1.")
+    save_boxes(boxes)
 def main():
     initialize_boxes()
     boxes = load_boxes()
+    
+    while True:
+        print("\nLeitner System Menu:")
+        print("1. Add a new word")
+        print("2. Review a box")
+        print("3. Exit")
+        choice = input("choose an option: ").strip()
+        
+        if choose == "1":
+            word = input("Enter the new word: ").strip()
+            meaning = input(f"Enter the meaming of '{word}': ").strip()
+            add_word(boxes, word, meaning)
+        
