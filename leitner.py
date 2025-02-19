@@ -15,9 +15,13 @@ BOXES = {
 def initialize_boxes():
     if not os.path.exists(DATA_FILE):
         boxes = {box: [] for box in BOXES}
-        with open(DATA_FILE, "w") as f:
-            json.dump(boxes, f);
+        with open(DATA_FILE, "w") as file:
+            json.dump(boxes, file);
 
+def load_boxes():
+    with open(DATA_FILE, "r") as file:
+        return json.load(file)
 
 def main():
     initialize_boxes()
+    boxes = load_boxes()
