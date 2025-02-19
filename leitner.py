@@ -11,3 +11,13 @@ BOXES = {
     4: timedelta(days=14), # box 4 : review every 14 day
     5: timedelta(days=30), # box 5 : review every 30 day
 }
+
+def initialize_boxes():
+    if not os.path.exists(DATA_FILE):
+        boxes = {box: [] for box in BOXES}
+        with open(DATA_FILE, "w") as f:
+            json.dump(boxes, f);
+
+
+def main():
+    initialize_boxes()
