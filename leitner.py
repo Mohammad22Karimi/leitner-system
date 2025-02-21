@@ -27,35 +27,41 @@ def save_boxes(boxes):
         json.dump(boxes, file, indent=4)
 
 def add_word(boxes, word, meaning):
-    boxes["1"].append({"word": word, "meaning": meaning, "last_reiviewed": datetime.now().isoformat()})
+    next_review = (datetime.now() + BOXES[1]).isoformat()
+    boxes["1"].append({"word": word, "meaning": meaning, "next_review": next_review})
     print(f"Added '{word}' to box 1.")
     save_boxes(boxes)
     
 def review_box(boxes, box_number):
     box_key = str(box_number)
-    if not boxes[box_key]:
-        print(f"Box {box_number} is empty.")
+    now = datetime.now()
+    due_words = [item for item in boxes[box_key] if datetime.fromisoformat(item["next_review"]) <= now]
+    
+    if not due_words:
+        print(f"No words to review in Box {box_number} today.")
         return
     
     print(f"Reviewing box {box_number}:")
-    for item in boxes[box_key][:]: 
+    for item in due_words[:]: 
         word = item["word"]
         meaning = item["meaning"]
         response = input(f"'{word}'? ({meaning}) (y/n): ").strip().lower()
         if response == "y":
             if box_number < len(BOXES):
                 next_box = str(box_number + 1)
-                boxes[next_box].append({"word": word, "meaning": meaning, "last_reviewed": datetime.now().isoformat()})
-                print(f"Moved '{word}' to box {next_box}.")
+                next_review = (datetime.now() + BOXES[box_number + 1]).isoformat()
+                boxes[next_box].append({"word": word, "meaning": meaning, "next_review": next_review})
+                print(f"Moved '{word}' to Box {next_box} (Next review on {next_review}).")
                 
             else:
                 print(f"'{word}' is in the final box. No further moves.")
-            boxes[box_key].remove(item)
             
         else:
-            boxes["1"].append({"word": word, "meaning": meaning, "last_reviewed": datetime.now().isoformat()})
-            print(f"Moved '{word}' back to Box 1.")
-            boxes[box_key].remove(item)
+            next_review = (datetime.now() + BOXES[1]).isoformat()
+            boxes["1"].append({"word": word, "meaning": meaning, "next_review": next_review})
+            print(f"Moved '{word}' back to Box 1 (Next review on {next_review}).")
+
+        boxes[box_key].remove(item)
             
     save_boxes(boxes)
 
